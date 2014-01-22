@@ -48,4 +48,25 @@
     return [WXCondition imageMap][self.icon];
 }
 
++ (NSDictionary *)JSONKeyPathsByPropertyKey
+{
+    // The dictionary key is WXCondition‘s property name,
+    // while the dictionary value is the keypath from the JSON.
+    return @{
+             @"date": @"dt",
+             @"locationName": @"name",
+             @"humidity": @"main.humidity",
+             @"temperature": @"main.temp",
+             @"tempHigh": @"main.temp_max",
+             @"tempLow": @"main.temp_min",
+             @"sunrise": @"sys.sunrise",
+             @"sunset": @"sys.sunset",
+             @"conditionDescription": @"weather.description",
+             @"condition": @"weather.main",
+             @"icon": @"weather.icon",
+             @"windBearing": @"wind.deg",
+             @"windSpeed": @"wind.speed"
+             };
+}
+
 @end
