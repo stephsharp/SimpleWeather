@@ -48,6 +48,8 @@
     return [WXCondition imageMap][self.icon];
 }
 
+#pragma mark - MTLJSONSerializing protocol methods
+
 + (NSDictionary *)JSONKeyPathsByPropertyKey
 {
     // The dictionary key is WXCondition‘s property name,
@@ -67,6 +69,66 @@
              @"windBearing": @"wind.deg",
              @"windSpeed": @"wind.speed"
              };
+}
+
+#pragma mark - Mantle transformers
+
+// To create a transformer for a specific property, you add a class method
+// that begins with the property name and ends with JSONTransformer.
++ (NSValueTransformer *)dateJSONTransformer
+{
+    // Return a MTLValueTransformer using blocks to transform values to and from Objective-C properties
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^(NSString *str) {
+                    return [NSDate dateWithTimeIntervalSince1970:str.floatValue];
+                }
+                reverseBlock:^(NSDate *date) {
+                    return [NSString stringWithFormat:@"%f",[date timeIntervalSince1970]];
+                }];
+}
+
+// Reuse dateJSONTransformer for sunrise and sunset
++ (NSValueTransformer *)sunriseJSONTransformer
+{
+    return [self dateJSONTransformer];
+}
+
++ (NSValueTransformer *)sunsetJSONTransformer
+{
+    return [self dateJSONTransformer];
+}
+
+// The weather key is a JSON array, but we're only concerned about a single weather condition
++ (NSValueTransformer *)conditionDescriptionJSONTransformer
+{
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^(NSArray *values) {
+                    return [values firstObject];
+                }
+                reverseBlock:^(NSString *str) {
+                    return @[str];
+                }];
+}
+
++ (NSValueTransformer *)conditionJSONTransformer
+{
+    return [self conditionDescriptionJSONTransformer];
+}
+
++ (NSValueTransformer *)iconJSONTransformer
+{
+    return [self conditionDescriptionJSONTransformer];
+}
+
+// OpenWeatherAPI uses meters-per-second for wind speed, convert this to miles-per-hour
+#define MPS_TO_MPH 2.23694f
+
++ (NSValueTransformer *)windSpeedJSONTransformer
+{
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^(NSNumber *num) {
+                    return @(num.floatValue*MPS_TO_MPH);
+                }
+                reverseBlock:^(NSNumber *speed) {
+                    return @(speed.floatValue/MPS_TO_MPH);
+                }];
 }
 
 @end
