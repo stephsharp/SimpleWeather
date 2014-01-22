@@ -10,4 +10,42 @@
 
 @implementation WXCondition
 
++ (NSDictionary *)imageMap
+{
+    // Create a static NSDictionary since every instance of WXCondition will use the same data mapper
+    static NSDictionary *_imageMap = nil;
+    if (! _imageMap)
+    {
+        // Map the condition codes to an image file (e.g. “01d” to “weather-clear.png”)
+        // All condition codes: http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        _imageMap = @{
+                      @"01d" : @"weather-clear",
+                      @"02d" : @"weather-few",
+                      @"03d" : @"weather-few",
+                      @"04d" : @"weather-broken",
+                      @"09d" : @"weather-shower",
+                      @"10d" : @"weather-rain",
+                      @"11d" : @"weather-tstorm",
+                      @"13d" : @"weather-snow",
+                      @"50d" : @"weather-mist",
+                      @"01n" : @"weather-moon",
+                      @"02n" : @"weather-few-night",
+                      @"03n" : @"weather-few-night",
+                      @"04n" : @"weather-broken",
+                      @"09n" : @"weather-shower",
+                      @"10n" : @"weather-rain-night",
+                      @"11n" : @"weather-tstorm",
+                      @"13n" : @"weather-snow",
+                      @"50n" : @"weather-mist",
+                      };
+    }
+    return _imageMap;
+}
+
+// Declare the public message to get an image file name
+- (NSString *)imageName
+{
+    return [WXCondition imageMap][self.icon];
+}
+
 @end
