@@ -77,4 +77,19 @@
             }];
 }
 
+- (RACSignal *)fetchCurrentConditionsForLocation:(CLLocationCoordinate2D)coordinate
+{
+    // Format the URL from a CLLocationCoordinate2D object using its latitude and longitude
+    NSString *urlString = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&units=imperial",coordinate.latitude, coordinate.longitude];
+    NSURL *url = [NSURL URLWithString:urlString];
+
+    // Create the signal. Since the returned value is a signal, you can call other ReactiveCocoa methods on it.
+    // Here you map the returned value — an instance of NSDictionary — into a different value.
+    return [[self fetchJSONFromURL:url] map:^(NSDictionary *json) {
+        // Use MTLJSONAdapter to convert the JSON into an WXCondition object,
+        // using the MTLJSONSerializing protocol you created for WXCondition.
+        return [MTLJSONAdapter modelOfClass:[WXCondition class] fromJSONDictionary:json error:nil];
+    }];
+}
+
 @end
