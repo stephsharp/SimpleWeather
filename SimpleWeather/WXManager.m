@@ -79,4 +79,30 @@
     return self;
 }
 
+- (void)findCurrentLocation
+{
+    self.isFirstUpdate = YES;
+    [self.locationManager startUpdatingLocation];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    // Always ignore the first location update because it is almost always cached
+    if (self.isFirstUpdate)
+    {
+        self.isFirstUpdate = NO;
+        return;
+    }
+
+    CLLocation *location = [locations lastObject];
+
+    // Once you have a location with the proper accuracy, stop further updates
+    if (location.horizontalAccuracy > 0)
+    {
+        // Setting the currentLocation key triggers the RACObservable you set earlier in the init implementation
+        self.currentLocation = location;
+        [self.locationManager stopUpdatingLocation];
+    }
+}
+
 @end
