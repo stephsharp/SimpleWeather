@@ -92,4 +92,25 @@
     }];
 }
 
+- (RACSignal *)fetchHourlyForecastForLocation:(CLLocationCoordinate2D)coordinate
+{
+    NSString *urlString = [NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/forecast?lat=%f&lon=%f&units=imperial&cnt=12",coordinate.latitude, coordinate.longitude];
+    NSURL *url = [NSURL URLWithString:urlString];
+
+    // Use -fetchJSONFromURL again and map the JSON as appropriate
+    return [[self fetchJSONFromURL:url] map:^(NSDictionary *json) {
+        // Build an RACSequence from the “list” key of the JSON.
+        // RACSequences let you perform ReactiveCocoa operations on lists.
+        RACSequence *list = [json[@"list"] rac_sequence];
+
+        // Map the new list of objects. This calls -map: on each object in the list, returning a list of new objects.
+        return [[list map:^(NSDictionary *item) {
+            // Use MTLJSONAdapter again to convert the JSON into a WXCondition object
+            return [MTLJSONAdapter modelOfClass:[WXCondition class] fromJSONDictionary:item error:nil];
+            // Using -map on RACSequence returns another RACSequence,
+            // so use this convenience method to get the data as an NSArray.
+        }] array];
+    }];
+}
+
 @end
