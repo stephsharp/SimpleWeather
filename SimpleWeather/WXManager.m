@@ -105,4 +105,29 @@
     }
 }
 
+// These 3 fetch methods call methods on the client and save values on the manager.
+// All 3 of these methods are bundled up and subscribed to by the RACObservable created in the init method.
+// You’ll return the same signals that the client returns, which can also be subscribed to.
+// All of the property assignments are happening in side-effects with -doNext:.
+- (RACSignal *)updateCurrentConditions
+{
+    return [[self.client fetchCurrentConditionsForLocation:self.currentLocation.coordinate] doNext:^(WXCondition *condition) {
+        self.currentCondition = condition;
+    }];
+}
+
+- (RACSignal *)updateHourlyForecast
+{
+    return [[self.client fetchHourlyForecastForLocation:self.currentLocation.coordinate] doNext:^(NSArray *conditions) {
+        self.hourlyForecast = conditions;
+    }];
+}
+
+- (RACSignal *)updateDailyForecast
+{
+    return [[self.client fetchDailyForecastForLocation:self.currentLocation.coordinate] doNext:^(NSArray *conditions) {
+        self.dailyForecast = conditions;
+    }];
+}
+
 @end

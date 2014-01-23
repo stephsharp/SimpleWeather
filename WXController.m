@@ -8,6 +8,7 @@
 
 #import "WXController.h"
 #import <LBBlurredImage/UIImageView+LBBlurredImage.h>
+#import "WXManager.h"
 
 @interface WXController ()
 
@@ -130,6 +131,9 @@
     iconView.contentMode = UIViewContentModeScaleAspectFit;
     iconView.backgroundColor = [UIColor clearColor];
     [header addSubview:iconView];
+
+    // Begin finding the current location of the device
+    [[WXManager sharedManager] findCurrentLocation];
 }
 
 - (void)viewWillLayoutSubviews
