@@ -154,14 +154,17 @@
       // Delivers any changes on the main thread since you’re updating the UI
       deliverOn:RACScheduler.mainThreadScheduler]
      subscribeNext:^(WXCondition *newCondition) {
-         // Updates the text labels with weather data; you’re using newCondition for the text and not the singleton.
-         // The subscriber parameter is guaranteed to be the new value.
-         temperatureLabel.text = [NSString stringWithFormat:@"%.0f°",newCondition.temperature.floatValue];
-         conditionsLabel.text = [newCondition.condition capitalizedString];
-         cityLabel.text = [newCondition.locationName capitalizedString];
+         if (newCondition)
+         {
+             // Updates the text labels with weather data; you’re using newCondition for the text and not the singleton.
+             // The subscriber parameter is guaranteed to be the new value.
+             temperatureLabel.text = [NSString stringWithFormat:@"%.0f°",newCondition.temperature.floatValue];
+             conditionsLabel.text = [newCondition.condition capitalizedString];
+             cityLabel.text = [newCondition.locationName capitalizedString];
 
-         // Uses the mapped image file name to create an image and sets it as the icon for the view
-         iconView.image = [UIImage imageNamed:[newCondition imageName]];
+             // Uses the mapped image file name to create an image and sets it as the icon for the view
+             iconView.image = [UIImage imageNamed:[newCondition imageName]]; // Error if newCondition is nil
+         }
      }];
 
     // This code binds high and low temperature values to the hiloLabel‘s text property.
