@@ -147,6 +147,23 @@
          iconView.image = [UIImage imageNamed:[newCondition imageName]];
      }];
 
+    // This code binds high and low temperature values to the hiloLabel‘s text property.
+    // The RAC(…) macro helps keep syntax clean. The returned value from the signal is assigned
+    // to the text key of the hiloLabel object.
+    RAC(hiloLabel, text) = [[RACSignal combineLatest:@[
+                                // Observe the high and low temperatures of the currentCondition key.
+                                // Combine the signals and use the latest values for both.
+                                // The signal fires when either key changes.
+                                RACObserve([WXManager sharedManager], currentCondition.tempHigh),
+                                RACObserve([WXManager sharedManager], currentCondition.tempLow)]
+                                // Reduce the values from your combined signals into a single value;
+                                // note that the parameter order matches the order of your signals.
+                                reduce:^(NSNumber *hi, NSNumber *low) {
+                                    return [NSString  stringWithFormat:@"%.0f° / %.0f°",hi.floatValue,low.floatValue];
+                                }]
+                                // Again, since you’re working on the UI, deliver everything on the main thread.
+                                deliverOn:RACScheduler.mainThreadScheduler];
+
     // Begin finding the current location of the device
     [[WXManager sharedManager] findCurrentLocation];
 }
