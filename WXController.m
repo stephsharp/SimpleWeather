@@ -327,8 +327,25 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // TODO: Determine cell height based on screen
-    return 44;
+    NSInteger cellCount = [self tableView:tableView numberOfRowsInSection:indexPath.section];
+    return self.screenHeight / (CGFloat)cellCount;
+}
+
+#pragma mark - UIScrollViewDelegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    // Get the height of the scroll view and the content offset. Cap the offset at 0
+    // so attempting to scroll past the start of the table won’t affect blurring.
+    CGFloat height = scrollView.bounds.size.height;
+    CGFloat position = MAX(scrollView.contentOffset.y, 0.0);
+
+    // Divide the offset by the height with a maximum of 1 so that your offset is capped at 100%.
+    CGFloat percent = MIN(position / height, 1.0);
+
+    // Assign the resulting value to the blur image’s alpha property
+    // to change how much of the blurred image you’ll see as you scroll.
+    self.blurredImageView.alpha = percent;
 }
 
 @end
